@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Sequência de Cores — Narrador por Voz</title>
+  <meta name="description" content="Monte a sequência de cores das garrafas e ouça uma voz em português do Brasil narrando a ordem escolhida. Rápido, simples e funciona no celular.">
+  <meta name="theme-color" content="#07070d">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='22' cy='50' r='16' fill='%23facc15'/%3E%3Ccircle cx='50' cy='50' r='16' fill='%23ef4444'/%3E%3Ccircle cx='78' cy='50' r='16' fill='%2322c55e'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="bg-orbs" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <main class="app">
+    <header class="hero">
+      <div class="logo-dots" aria-hidden="true">
+        <i style="--c:#facc15;--i:0"></i><i style="--c:#ef4444;--i:1"></i><i style="--c:#22c55e;--i:2"></i><i style="--c:#3b82f6;--i:3"></i><i style="--c:#a855f7;--i:4"></i>
+      </div>
+      <h1>Sequência de <span class="grad">Cores</span></h1>
+      <p>Monte a ordem das garrafas e ouça a narração em português.</p>
+    </header>
+
+    <div class="alert" id="unsupported" role="alert" hidden>
+      ⚠️ Seu navegador não suporta narração por voz. Abra esta página no Chrome, Edge ou Safari atualizados.
+    </div>
+
+    <!-- Prévia -->
+    <section class="card preview-card" aria-labelledby="preview-title">
+      <div class="card-head">
+        <h2 id="preview-title">Sua sequência</h2>
+        <span class="badge" id="status-badge">Pronto</span>
+      </div>
+      <ol class="bottles" id="bottles" aria-label="Prévia visual da sequência"></ol>
+      <p class="sequence-text" id="sequence-text" aria-live="off"></p>
+      <button type="button" class="btn btn-replay" id="btn-replay" hidden>↻ Reproduzir novamente</button>
+    </section>
+
+    <div class="grid">
+      <!-- Posições -->
+      <section class="card" aria-labelledby="positions-title">
+        <div class="card-head">
+          <h2 id="positions-title"><span class="step">1</span> Monte a sequência</h2>
+          <div class="stepper" role="group" aria-label="Quantidade de posições">
+            <button type="button" id="btn-remove-pos" aria-label="Remover última posição">−</button>
+            <output id="pos-count" aria-live="polite">5</output>
+            <button type="button" id="btn-add-pos" aria-label="Adicionar posição">+</button>
+          </div>
+        </div>
+
+        <div class="palette-wrap">
+          <p class="hint">Toque numa cor para preencher a <strong>posição <span id="active-label">1</span></strong></p>
+          <div class="palette" id="palette"></div>
+        </div>
+
+        <ul class="positions" id="positions" aria-label="Posições da sequência"></ul>
+        <button type="button" class="add-row" id="btn-add-row">+ Adicionar posição</button>
+      </section>
+
+      <div class="side">
+        <!-- Áudio -->
+        <section class="card" aria-labelledby="audio-title">
+          <h2 id="audio-title" class="card-title"><span class="step">2</span> Ouça a narração</h2>
+
+          <button type="button" class="btn-play" id="btn-play">
+            <span class="play-icon" aria-hidden="true">🔊</span>
+            <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <span class="btn-label">Escutar áudio</span>
+          </button>
+
+          <div class="row-2">
+            <button type="button" class="btn" id="btn-repeat">🔁 Repetir áudio</button>
+            <button type="button" class="btn btn-danger" id="btn-stop" disabled>⏹ Parar áudio</button>
+          </div>
+
+          <div class="field">
+            <span class="label" id="speed-label">Velocidade</span>
+            <div class="segmented" id="speed" role="radiogroup" aria-labelledby="speed-label">
+              <button type="button" role="radio" data-speed="slow" id="speed-slow">Lenta</button>
+              <button type="button" role="radio" data-speed="normal" id="speed-normal">Normal</button>
+              <button type="button" role="radio" data-speed="fast" id="speed-fast">Rápida</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="voice-select">Voz</label>
+            <div class="voice-row">
+              <div class="select-wrap">
+                <select id="voice-select"><option>Carregando vozes…</option></select>
+              </div>
+              <button type="button" class="btn btn-sm" id="btn-test-voice">Testar</button>
+            </div>
+            <p class="hint small" id="voice-hint"></p>
+          </div>
+        </section>
+
+        <!-- Ferramentas -->
+        <section class="card" aria-labelledby="tools-title">
+          <h2 id="tools-title" class="card-title"><span class="step">3</span> Ferramentas</h2>
+          <div class="tools">
+            <button type="button" class="btn tool" id="btn-shuffle"><span class="ico" aria-hidden="true">🔀</span>Embaralhar cores</button>
+            <button type="button" class="btn tool" id="btn-copy"><span class="ico" aria-hidden="true">📋</span>Copiar sequência</button>
+            <button type="button" class="btn tool btn-danger" id="btn-clear"><span class="ico" aria-hidden="true">🗑️</span>Limpar sequência</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <footer class="shortcuts">
+      Atalhos: <kbd>Espaço</kbd> escutar/parar · <kbd>Esc</kbd> parar · <kbd>1</kbd>–<kbd>0</kbd> escolher cor · <kbd>←</kbd><kbd>→</kbd> mudar posição · <kbd>Del</kbd> esvaziar posição
+    </footer>
+  </main>
+
+  <!-- Barra fixa no celular -->
+  <div class="mobile-bar">
+    <button type="button" class="btn-play" id="btn-play-mobile">
+      <span class="play-icon" aria-hidden="true">🔊</span>
+      <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span class="btn-label">Escutar áudio</span>
+    </button>
+    <button type="button" class="btn btn-danger" id="btn-stop-mobile" aria-label="Parar áudio" disabled>⏹</button>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
